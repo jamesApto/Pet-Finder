@@ -33,6 +33,9 @@
     "react": "15.x || 16.x || 16.4.0-alpha.0911da3",
     "react-dom": "15.x || 16.x || 16.4.0-alpha.0911da3",
     "react-emotion": "^9.2.12",
-    "react-loadable": "^5.5.0"
+    "react-loadable": "^5.5.0",
+    "react-redux": "^5.1.0",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
   }
 }
