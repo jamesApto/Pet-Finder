@@ -1,13 +1,13 @@
 import React from 'react';
 import { render } from 'react-dom';
-import Results from './Results';
 import { Router } from "@reach/router";
-import Details from './Details';
-import SearchParams from './SearchParams';
 import pf from 'petfinder-client';
 import { Provider } from './SearchContext';
 import NavBar from './NavBar';
 import { injectGlobal } from 'emotion';
+import Loadable from 'react-loadable';
+import Results from './Results';
+import SearchParams from './SearchParams';
 
 // inject global styles
 injectGlobal`
@@ -19,6 +19,16 @@ injectGlobal`
 const petfinder = pf({
   key: process.env.API_KEY,
   secret: process.env.API_SECRET
+});
+
+// you should only code split if it saves a significant amount of time like 1/2 second +
+// code splitting details page. so it only loads the details page when you go to the page
+// you could use service workers to load json of additional packages in the background. Parcel can generate the json for you.
+const LoadableDetails = Loadable({
+  loader: () => import('./Details'),
+  loading() {
+    return <h1>Loading split out content</h1>;
+  }
 });
 
 class App extends React.Component {
@@ -86,7 +96,7 @@ class App extends React.Component {
         <Provider value={this.state}>
           <Router>
             <Results path="/" />
-            <Details path="/details/:id" />
+            <LoadableDetails path="/details/:id" />
             <SearchParams path="/search-params" />
           </Router>
         </Provider>
