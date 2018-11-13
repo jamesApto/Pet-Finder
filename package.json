@@ -1,8 +1,8 @@
 {
-  "name": "y",
-  "version": "y",
-  "description": "y",
-  "main": "y",
+  "name": "pet_finder",
+  "version": "1.0.0",
+  "description": "Pet Finder",
+  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write \"src/**/*.{js,jsx,css,json}\"",
