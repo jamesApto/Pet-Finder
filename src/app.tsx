@@ -4,22 +4,30 @@ import { Router } from "@reach/router";
 import pf from 'petfinder-client';
 import { Provider } from './SearchContext';
 import NavBar from './NavBar';
-import { injectGlobal } from 'emotion';
 import Loadable from 'react-loadable';
 import Results from './Results';
 import SearchParams from './SearchParams';
 
-// inject global styles
-injectGlobal`
-  * {
-    box-sizing: border-box;
-  }
-`;
+if (!process.env.API_KEY || !process.env.API_SECRET) {
+  throw new Error("No API KEY");
+}
 
 const petfinder = pf({
   key: process.env.API_KEY,
   secret: process.env.API_SECRET
 });
+
+interface State {
+  location: string;
+  animal: string;
+  breed: string;
+  breeds: string[];
+  handleAnimalChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleBreedChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  handleLocationChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  getBreeds: () => void;
+}
+
 
 // you should only code split if it saves a significant amount of time like 1/2 second +
 // code splitting details page. so it only loads the details page when you go to the page
@@ -31,8 +39,8 @@ const LoadableDetails = Loadable({
   }
 });
 
-class App extends React.Component {
-  constructor(props) {
+class App extends React.Component<{}, State> {
+  public constructor(props: {}) {
     super(props);
 
     this.state = {
@@ -47,27 +55,27 @@ class App extends React.Component {
     }
   }
 
-  handleLocationChange = event => {
+  public handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
       location: event.target.value,
     });
   };
 
-  handleAnimalChange = event => {
+  public handleAnimalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({
       animal: event.target.value,
       breed: "",
       breeds: []
-    }, this.getBreads);
+    }, this.getBreeds);
   };
 
-  handleBreedChange = event => {
+  public handleBreedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     this.setState({
       breed: event.target.value
     });
   };
 
-  getBreads() {
+  public getBreeds() {
     if (this.state.animal) {
       petfinder.breed.list({
         animal: this.state.animal
@@ -89,7 +97,7 @@ class App extends React.Component {
     }
   }
 
-  render() {
+  public render() {
     return (
       <React.Fragment>
         <NavBar />

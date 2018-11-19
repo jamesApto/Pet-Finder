@@ -1,9 +1,13 @@
 import React from "react";
-import pf from 'petfinder-client';
-import { navigate } from "@reach/router";
+import pf, { PetMedia } from 'petfinder-client';
+import { navigate, RouteComponentProps } from "@reach/router";
 import Carousel from "./Carousel";
 import Modal from "./Modal";
 import Loadable from 'react-loadable';
+
+if (!process.env.API_KEY || !process.env.API_SECRET) {
+  throw new Error("No API KEY");
+}
 
 const petfinder = pf({
   key: process.env.API_KEY,
@@ -17,31 +21,48 @@ const LoadableContent = Loadable({
   }
 });
 
-class Details extends React.Component {
+class Details extends React.Component<RouteComponentProps<{ id: string}>>{
   // new syntax
-  state = {
+  public state = {
     loading: true,
-    showModal: false
+    showModal: false,
+    name: "",
+    location: "",
+    animal: "",
+    breed: "",
+    description: "",
+    media: {} as PetMedia
   };
 
-  toggleModal = () => {
+  public toggleModal = () => {
     this.setState({
       showModal: !this.state.showModal
     });
   };
 
-  componentDidMount() {
+  public componentDidMount() {
+    if (!this.props.id) {
+      return;
+    }
+
     petfinder.pet.get({
       output: "full",
       id: this.props.id
     }).then(data => {
+      if (!data.petfinder.pet) {
+        navigate('/');
+        return;
+      }
+
       const pet = data.petfinder.pet;
       let breed;
+
       if (Array.isArray(pet.breeds.breed)) {
         breed = pet.breeds.breed.join(", ");
       } else {
         breed = pet.breeds.breed;
       }
+
       this.setState({
         name: pet.name,
         animal: pet.animal,
@@ -56,21 +77,18 @@ class Details extends React.Component {
     });
   }
 
-  render() {
+  public render() {
     if (this.state.loading) {
       return <h1>Loading</h1>;
     }
 
     const { name, animal, breed, location, description, media, showModal } = this.state;
 
-    // use ref to grab a dom node for 3rd party libraries like jquery or d3
-    console.log(this.myH1);
-
     return (
       <div className="details">
         <Carousel media={media} />
         <div>
-          <h1 ref={(el) => this.myH1 = el}>{name}</h1>
+          <h1>{name}</h1>
           <h2>{animal} - {breed} - {location}</h2>
           <button onClick={this.toggleModal}>Adopt {name}
           </button>

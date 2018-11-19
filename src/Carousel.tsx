@@ -1,7 +1,17 @@
 import React from 'react';
+import { PetMedia, PetPhoto } from 'petfinder-client';
 
-class Carousel extends React.Component {
-    state = {
+interface Props {
+    media: PetMedia
+}
+
+interface State {
+    active: number,
+    photos: PetPhoto[]
+}
+
+class Carousel extends React.Component<Props, State> {
+    public state = {
         photos: [],
         active: 0
     };
@@ -13,8 +23,9 @@ class Carousel extends React.Component {
     }
     */
 
-    static getDerivedStateFromProps({ media }) {
-        let photos = [];
+    public static getDerivedStateFromProps({ media }: Props) {
+        let photos: PetPhoto[] = [];
+
         if (media && media.photos && media.photos.photo) {
             photos = media.photos.photo.filter(photo => photo["@size"] === "pn");
         }
@@ -25,7 +36,7 @@ class Carousel extends React.Component {
     }
 
     /* unbound
-    handleIndexClick(event) {
+    public handleIndexClick(event) {
         // we have to bind here so state works correctly
         this.setState({
             active: +event.target.dataset.index // the + converts a string to a number (coercion)
@@ -33,16 +44,22 @@ class Carousel extends React.Component {
     }
     */
 
-    handleIndexClick = event => {
-        // we have to bind here so state works correctly
-        this.setState({
-            active: +event.target.dataset.index // the + converts a string to a number (coercion)
-        });
+    public handleIndexClick = (event: React.MouseEvent<HTMLElement>) => {
+        if (!(event.target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (event.target.dataset.index) {
+            // we have to bind here so state works correctly
+            this.setState({
+                active: +event.target.dataset.index // the + converts a string to a number (coercion)
+            });
+        }
     };
 
-    render() {
+    public render() {
         // destructering
-        const { photos, active } = this.state;
+        const { photos, active }: State = this.state;
         const hero = photos[active] ? photos[active].value : "http://placecorgi.com/300/300";
 
         return (
